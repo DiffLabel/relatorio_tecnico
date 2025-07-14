@@ -3,152 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <title>Relatório Técnico – Aprovação de Arte</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f2f2f2;
       margin: 0;
-      background: #f5f5f5;
+      padding: 0;
     }
 
     .container {
-      width: 800px;
+      max-width: 800px;
       margin: 40px auto;
-      background: white;
-      padding: 40px;
+      background: #fff;
+      padding: 30px;
       border: 1px solid #ccc;
+      border-radius: 8px;
     }
 
-    header, footer {
+    h1 {
       text-align: center;
-      margin-bottom: 30px;
-    }
-
-    header h2 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    header p {
-      margin: 4px 0;
-      font-size: 14px;
     }
 
     label {
       font-weight: bold;
-      display: block;
       margin-top: 15px;
+      display: block;
     }
 
     input, select {
       width: 100%;
       padding: 8px;
-      margin-top: 4px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
+      margin-top: 5px;
+      margin-bottom: 10px;
     }
 
-    .bobina-opcoes {
-      display: flex;
-      gap: 15px;
-      margin-top: 10px;
-    }
-
-    .bobina {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 2px solid transparent;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .bobina:hover {
-      border-color: #005ca9;
-      background: #e6f0fa;
-    }
-
-    .bobina.selected {
-      border-color: #005ca9;
-      background: #d0e8ff;
-    }
-
-    .bobina img {
-      width: 50px;
-      height: 50px;
-      margin-bottom: 6px;
-    }
-
-    .botao {
-      margin-top: 30px;
-      padding: 12px 20px;
+    button {
+      padding: 10px 20px;
       background-color: #005ca9;
       color: white;
       border: none;
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 20px;
     }
 
-    .linha-corte {
-      color: magenta;
-      font-weight: bold;
+    .bobina-img {
+      position: relative;
       margin-top: 10px;
     }
 
-    #preview {
-      margin-top: 30px;
-      border-top: 1px dashed #ccc;
-      padding-top: 20px;
+    .bobina-img img {
+      width: 100%;
+      max-width: 600px;
+      display: block;
+      margin: auto;
     }
 
-    footer {
-      font-size: 12px;
-      color: #555;
-      margin-top: 40px;
+    .bobina-option {
+      position: absolute;
+      width: 25%;
+      height: 100%;
+      top: 0;
+      cursor: pointer;
+    }
+
+    .bobina-option.selected {
+      outline: 4px solid #005ca9;
+      background: rgba(0, 92, 169, 0.1);
+    }
+
+    .status {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h2>RELATÓRIO TÉCNICO DA ARTE</h2>
-      <p>Aprovação de layout para impressão</p>
-    </header>
+    <h1>Relatório Técnico – Aprovação de Arte</h1>
 
     <form id="formulario">
       <label>Nome do Cliente:</label>
       <input type="text" id="cliente" required>
 
-      <label>Upload da Arte (PDF ou imagem):</label>
-      <input type="file" id="arquivo" accept=".pdf,image/*" required>
+      <label>Upload de Artes (PDFs):</label>
+      <input type="file" id="arquivos" accept="application/pdf" multiple required>
 
       <label>Data:</label>
       <input type="text" id="data" readonly>
 
       <label>Sentido de Desbobinamento:</label>
-      <div class="bobina-opcoes">
-        <div class="bobina" data-sentido="Cima">
-          <img src="https://cdn-icons-png.flaticon.com/512/130/130304.png" alt="Cima">
-          <span>Cima</span>
-        </div>
-        <div class="bobina" data-sentido="Direita">
-          <img src="https://cdn-icons-png.flaticon.com/512/130/130298.png" alt="Direita">
-          <span>Direita</span>
-        </div>
-        <div class="bobina" data-sentido="Baixo">
-          <img src="https://cdn-icons-png.flaticon.com/512/130/130303.png" alt="Baixo">
-          <span>Baixo</span>
-        </div>
-        <div class="bobina" data-sentido="Esquerda">
-          <img src="https://cdn-icons-png.flaticon.com/512/130/130297.png" alt="Esquerda">
-          <span>Esquerda</span>
-        </div>
+      <div class="bobina-img" id="bobinaImg">
+        <img src="bobinas.png" alt="Sentidos de bobina">
+        <div class="bobina-option" data-sentido="1" style="left: 0%;"></div>
+        <div class="bobina-option" data-sentido="2" style="left: 25%;"></div>
+        <div class="bobina-option" data-sentido="3" style="left: 50%;"></div>
+        <div class="bobina-option" data-sentido="4" style="left: 75%;"></div>
       </div>
-
-      <input type="hidden" id="sentido">
+      <input type="hidden" id="sentido" required>
 
       <label>Tipo de Material:</label>
       <select id="material" required>
@@ -166,55 +122,82 @@
         <option value="Sem Acabamento">Sem Acabamento</option>
       </select>
 
-      <button type="submit" class="botao">Gerar Relatório</button>
+      <button type="submit">Gerar PDF</button>
     </form>
 
-    <div id="preview"></div>
-
-    <footer>
-      Concordo com o termo de responsabilidade acima após ter conferido todas as informações deste layout.<br>
-      A responsabilidade do atendimento às normas técnicas são única e exclusivamente por conta do cliente.<br>
-      O prazo de entrega começa a contar a partir da data de recebimento da aprovação dos dados deste documento.
-    </footer>
+    <div class="status" id="status"></div>
   </div>
 
   <script>
     document.getElementById("data").value = new Date().toLocaleDateString();
 
-    const bobinas = document.querySelectorAll(".bobina");
-    const inputSentido = document.getElementById("sentido");
+    const sentidoInput = document.getElementById("sentido");
+    const options = document.querySelectorAll(".bobina-option");
 
-    bobinas.forEach(b => {
-      b.addEventListener("click", () => {
-        bobinas.forEach(el => el.classList.remove("selected"));
-        b.classList.add("selected");
-        inputSentido.value = b.getAttribute("data-sentido");
+    options.forEach(option => {
+      option.addEventListener("click", () => {
+        options.forEach(o => o.classList.remove("selected"));
+        option.classList.add("selected");
+        sentidoInput.value = option.dataset.sentido;
       });
     });
 
-    document.getElementById("formulario").addEventListener("submit", function(e) {
+    document.getElementById("formulario").addEventListener("submit", async function(e) {
       e.preventDefault();
 
+      if (!sentidoInput.value) {
+        alert("Por favor, selecione o sentido da bobina.");
+        return;
+      }
+
       const cliente = document.getElementById("cliente").value;
-      const arquivo = document.getElementById("arquivo").files[0];
       const data = document.getElementById("data").value;
-      const sentido = inputSentido.value;
+      const sentido = sentidoInput.value;
       const material = document.getElementById("material").value;
       const acabamento = document.getElementById("acabamento").value;
-      const nomeProjeto = arquivo.name.replace(/\.[^/.]+$/, "");
+      const arquivos = document.getElementById("arquivos").files;
 
-      const preview = `
-        <h3>Resumo do Relatório</h3>
-        <p><strong>Cliente:</strong> ${cliente}</p>
-        <p><strong>Projeto:</strong> ${nomeProjeto}</p>
-        <p><strong>Data:</strong> ${data}</p>
-        <p><strong>Sentido da Bobina:</strong> ${sentido}</p>
-        <p><strong>Material:</strong> ${material}</p>
-        <p><strong>Acabamento:</strong> ${acabamento}</p>
-        <p class="linha-corte">CORTE: 150 mm x 150 mm (linha Magenta 100%)</p>
-        <p><strong>Arquivo:</strong> ${arquivo.name}</p>
-      `;
-      document.getElementById("preview").innerHTML = preview;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+      for (let i = 0; i < arquivos.length; i++) {
+        const file = arquivos[i];
+        const nomeProjeto = file.name.replace(/\.[^/.]+$/, "");
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1 });
+        const largura = (viewport.width * 25.4 / 72).toFixed(2); // pt para mm
+        const altura = (viewport.height * 25.4 / 72).toFixed(2);
+
+        if (i > 0) doc.addPage();
+
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("RELATÓRIO TÉCNICO DA ARTE", 105, 20, { align: "center" });
+
+        doc.setFontSize(12);
+        doc.setFont("Helvetica", "normal");
+        doc.text(`Cliente: ${cliente}`, 20, 40);
+        doc.text(`Projeto: ${nomeProjeto}`, 20, 50);
+        doc.text(`Data: ${data}`, 20, 60);
+        doc.text(`Sentido da bobina: ${sentido}`, 20, 70);
+        doc.text(`Material: ${material}`, 20, 80);
+        doc.text(`Acabamento: ${acabamento}`, 20, 90);
+        doc.setTextColor(255, 0, 255);
+        doc.text(`CORTE: ${largura} mm x ${altura} mm (linha Magenta 100%)`, 20, 100);
+        doc.setTextColor(0, 0, 0);
+
+        // Rodapé
+        doc.setFontSize(9);
+        doc.text("Concordo com o termo de responsabilidade acima após ter conferido todas as informações deste layout.", 20, 270);
+        doc.text("A responsabilidade do atendimento às normas técnicas são única e exclusivamente por conta do cliente.", 20, 276);
+        doc.text("O prazo de entrega começa a contar a partir da data de recebimento da aprovação dos dados deste documento.", 20, 282);
+      }
+
+      doc.save(`Relatorio_${cliente}.pdf`);
+      document.getElementById("status").innerText = "PDF gerado com sucesso!";
     });
   </script>
 </body>
